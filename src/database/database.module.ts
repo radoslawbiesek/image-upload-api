@@ -1,27 +1,35 @@
-import { Global, Module } from '@nestjs/common';
+import {
+  Global,
+  Injectable,
+  Module,
+  OnApplicationShutdown,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+
 import * as schema from './schema';
 
-export const DB = Symbol('DB');
-export type DbType = PostgresJsDatabase<typeof schema>;
+@Injectable()
+export class DatabaseService implements OnApplicationShutdown {
+  readonly drizzle: ReturnType<typeof drizzle<typeof schema>>;
+  private readonly client: ReturnType<typeof postgres>;
+
+  constructor(config: ConfigService) {
+    this.client = postgres(
+      config.getOrThrow<string>('POSTGRES_CONNECTION_STRING'),
+    );
+    this.drizzle = drizzle(this.client, { schema });
+  }
+
+  async onApplicationShutdown(): Promise<void> {
+    await this.client.end();
+  }
+}
 
 @Global()
 @Module({
-  providers: [
-    {
-      provide: DB,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const client = postgres(
-          config.getOrThrow<string>('POSTGRES_CONNECTION_STRING'),
-        );
-
-        return drizzle(client, { schema });
-      },
-    },
-  ],
-  exports: [DB],
+  providers: [DatabaseService],
+  exports: [DatabaseService],
 })
 export class DatabaseModule {}
