@@ -13,7 +13,7 @@ export class ImagesService {
   async create(dto: CreateImageDto): Promise<ImageResponseDto> {
     const image = await this.imagesRepository.create({
       ...dto,
-      sourceUrl: '', // TODO: set after S3 upload
+      sourceUrl: null, // TODO: set after S3 upload
     });
 
     return image;

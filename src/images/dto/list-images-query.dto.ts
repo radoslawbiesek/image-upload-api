@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 
 export class ListImagesQueryDto {
   @ApiPropertyOptional({
@@ -17,7 +17,7 @@ export class ListImagesQueryDto {
     example: '019d9d52-5b20-7938-a06c-4863827044a4',
   })
   @IsOptional()
-  @IsString()
+  @IsUUID()
   cursor?: string;
 
   @ApiPropertyOptional({

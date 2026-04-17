@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
 } from '@nestjs/common';
@@ -16,11 +17,10 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { plainToInstance } from 'class-transformer';
 import { CreateImageDto } from './dto/create-image.dto';
 import { ImageResponseDto } from './dto/image-response.dto';
-import { ListImagesQueryDto } from './dto/list-images-query.dto';
 import { ImagesResponseDto } from './dto/images-response.dto';
+import { ListImagesQueryDto } from './dto/list-images-query.dto';
 import { ImagesService } from './images.service';
 
 @ApiTags('images')
@@ -33,13 +33,7 @@ export class ImagesController {
   @ApiOperation({ summary: 'Upload a new image' })
   @ApiCreatedResponse({ type: ImageResponseDto })
   async create(@Body() dto: CreateImageDto): Promise<ImageResponseDto> {
-    return plainToInstance(
-      ImageResponseDto,
-      await this.imagesService.create(dto),
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+    return this.imagesService.create(dto);
   }
 
   @Get()
@@ -48,13 +42,7 @@ export class ImagesController {
   async findAll(
     @Query() query: ListImagesQueryDto,
   ): Promise<ImagesResponseDto> {
-    return plainToInstance(
-      ImagesResponseDto,
-      await this.imagesService.findAll(query),
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+    return this.imagesService.findAll(query);
   }
 
   @Get(':id')
@@ -62,13 +50,9 @@ export class ImagesController {
   @ApiParam({ name: 'id', description: 'Image UUID' })
   @ApiOkResponse({ type: ImageResponseDto })
   @ApiNotFoundResponse({ description: 'Image not found' })
-  async findOne(@Param('id') id: string): Promise<ImageResponseDto> {
-    return plainToInstance(
-      ImageResponseDto,
-      await this.imagesService.findOne(id),
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ImageResponseDto> {
+    return this.imagesService.findOne(id);
   }
 }
