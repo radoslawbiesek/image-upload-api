@@ -9,6 +9,7 @@ import type { ImageResponseDto } from '../src/images/dto/image-response.dto';
 import type { ImagesResponseDto } from '../src/images/dto/images-response.dto';
 import { createApp } from './create-app';
 import { clearMockImages, saveMockImage } from './mocks';
+import { CreateImageDto } from 'src/images/dto/create-image.dto';
 
 describe('ImagesController (e2e)', () => {
   let app: INestApplication<App>;
@@ -51,11 +52,16 @@ describe('ImagesController (e2e)', () => {
       expect('sourceUrl' in body).toBe(false);
     });
 
-    it('returns 400 when required fields are missing', async () => {
-      await request(app.getHttpServer())
-        .post('/images')
-        .send({ title: 'Missing dimensions' })
-        .expect(400);
+    it.each([
+      ['title is missing', { width: 800, height: 600 }],
+      ['width is missing', { title: 'Test image', height: 600 }],
+      ['height is missing', { title: 'Test image', width: 800 }],
+      ['width is 0', { title: 'Test image', width: 0, height: 600 }],
+      ['width is negative', { title: 'Test image', width: -1, height: 600 }],
+      ['height is 0', { title: 'Test image', width: 800, height: 0 }],
+      ['height is negative', { title: 'Test image', width: 800, height: -1 }],
+    ])('returns 400 when %s', async (_: string, body: CreateImageDto) => {
+      await request(app.getHttpServer()).post('/images').send(body).expect(400);
     });
   });
 
