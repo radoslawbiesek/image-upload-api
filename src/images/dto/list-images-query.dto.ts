@@ -14,7 +14,7 @@ export class ListImagesQueryDto {
   @ApiPropertyOptional({
     description:
       'UUID of the first item of the requested page, as returned by nextCursor in the previous response',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: '019d9d52-5b20-7938-a06c-4863827044a4',
   })
   @IsOptional()
   @IsString()

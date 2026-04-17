@@ -1,33 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { CreateImageDto } from './dto/create-image.dto';
 import { ImageResponseDto } from './dto/image-response.dto';
-import { ListImagesQueryDto } from './dto/list-images-query.dto';
 import { ImagesResponseDto } from './dto/images-response.dto';
+import { ListImagesQueryDto } from './dto/list-images-query.dto';
+import { ImagesRepository } from './images.repository';
 
 @Injectable()
 export class ImagesService {
-  private readonly MOCK_IMAGE: ImageResponseDto = {
-    id: '550e8400-e29b-41d4-a716-446655440000',
-    url: 'https://placeholder.example.com/image.jpg',
-    title: 'MOCK image',
-    width: 1920,
-    height: 1080,
-  };
+  constructor(private readonly imagesRepository: ImagesRepository) {}
 
   async create(dto: CreateImageDto): Promise<ImageResponseDto> {
-    return {
-      ...this.MOCK_IMAGE,
-      title: dto.title,
-      width: dto.width,
-      height: dto.height,
-    };
+    const image = await this.imagesRepository.create({
+      ...dto,
+      sourceUrl: '', // TODO: set after S3 upload
+    });
+
+    return image;
   }
 
-  async findAll(_query: ListImagesQueryDto): Promise<ImagesResponseDto> {
-    return { data: [this.MOCK_IMAGE], nextCursor: null };
+  async findAll(query: ListImagesQueryDto): Promise<ImagesResponseDto> {
+    const limit = query.limit ?? 20;
+    const rows = await this.imagesRepository.findMany({
+      search: query.search,
+      cursor: query.cursor,
+      limit: limit + 1,
+    });
+
+    const hasMore = rows.length > limit;
+    const data = hasMore ? rows.slice(0, limit) : rows;
+    const nextCursor = hasMore ? rows[limit].id : null;
+
+    return { data, nextCursor };
   }
 
   async findOne(id: string): Promise<ImageResponseDto> {
-    return { ...this.MOCK_IMAGE, id };
+    const image = await this.imagesRepository.findById(id);
+    if (!image) {
+      throw new NotFoundException(`Image ${id} not found`);
+    }
+
+    return image;
   }
 }

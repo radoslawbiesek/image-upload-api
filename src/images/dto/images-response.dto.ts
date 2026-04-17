@@ -14,7 +14,7 @@ export class ImagesResponseDto {
     nullable: true,
     description:
       'UUID of the first item of the next page; null when there are no more pages',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: '019d9d52-5b20-7938-a06c-4863827044a4',
   })
   declare nextCursor: string | null;
 }

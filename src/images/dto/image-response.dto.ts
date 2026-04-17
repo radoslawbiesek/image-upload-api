@@ -1,18 +1,28 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
 export class ImageResponseDto {
   @Expose()
-  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiProperty({ example: '019d9d52-5b20-7938-a06c-4863827044a4' })
   declare id: string;
 
   @Expose()
-  @ApiProperty({ example: 'https://cdn.example.com/images/foo.jpg' })
-  declare url: string;
+  @ApiPropertyOptional({
+    example: 'https://cdn.example.com/images/foo.jpg',
+    nullable: true,
+  })
+  declare url: string | null;
 
   @Expose()
   @ApiProperty({ example: 'Sunset over mountains' })
   declare title: string;
+
+  @Expose()
+  @ApiProperty({
+    enum: ['pending', 'processing', 'ready', 'failed'],
+    example: 'pending',
+  })
+  declare status: string;
 
   @Expose()
   @ApiProperty({ example: 1920 })
