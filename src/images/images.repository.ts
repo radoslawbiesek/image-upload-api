@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { and, desc, eq, ilike, lte, SQL } from 'drizzle-orm';
 
 import { DatabaseService } from '../database/database.module';
@@ -19,6 +19,10 @@ export class ImagesRepository {
       .insert(images)
       .values(data)
       .returning();
+
+    if (!image) {
+      throw new InternalServerErrorException('Failed to create image');
+    }
 
     return image;
   }

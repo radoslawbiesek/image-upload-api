@@ -8,8 +8,14 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -17,10 +23,14 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
+
 import { CreateImageDto } from './dto/create-image.dto';
 import { ImageResponseDto } from './dto/image-response.dto';
 import { ImagesResponseDto } from './dto/images-response.dto';
 import { ListImagesQueryDto } from './dto/list-images-query.dto';
+import { MultipartGuard } from './guards/multipart.guard';
+import { imageFilePipe } from './pipes/image-file.pipe';
 import { ImagesService } from './images.service';
 
 @ApiTags('images')
@@ -30,10 +40,19 @@ export class ImagesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(MultipartGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload a new image' })
+  @ApiBody({ type: CreateImageDto })
   @ApiCreatedResponse({ type: ImageResponseDto })
-  async create(@Body() dto: CreateImageDto): Promise<ImageResponseDto> {
-    return this.imagesService.create(dto);
+  async create(
+    @UploadedFile(imageFilePipe) file: Express.Multer.File,
+    @Body() dto: CreateImageDto,
+  ): Promise<ImageResponseDto> {
+    const result = await this.imagesService.create(file, dto);
+
+    return plainToInstance(ImageResponseDto, result);
   }
 
   @Get()
@@ -42,7 +61,9 @@ export class ImagesController {
   async findAll(
     @Query() query: ListImagesQueryDto,
   ): Promise<ImagesResponseDto> {
-    return this.imagesService.findAll(query);
+    const result = await this.imagesService.findAll(query);
+
+    return plainToInstance(ImagesResponseDto, result);
   }
 
   @Get(':id')
@@ -53,6 +74,8 @@ export class ImagesController {
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ImageResponseDto> {
-    return this.imagesService.findOne(id);
+    const result = await this.imagesService.findOne(id);
+
+    return plainToInstance(ImageResponseDto, result);
   }
 }

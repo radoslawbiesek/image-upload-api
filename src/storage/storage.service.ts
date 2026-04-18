@@ -1,0 +1,41 @@
+import path from 'node:path';
+import { randomUUID } from 'node:crypto';
+
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+
+@Injectable()
+export class StorageService {
+  private readonly client: S3Client;
+
+  constructor(config: ConfigService) {
+    this.client = new S3Client({
+      region: config.getOrThrow<string>('AWS_REGION'),
+      credentials: {
+        accessKeyId: config.getOrThrow<string>('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: config.getOrThrow<string>('AWS_SECRET_ACCESS_KEY'),
+      },
+    });
+  }
+
+  async upload(
+    bucket: string,
+    key: string,
+    body: Buffer,
+    contentType: string,
+  ): Promise<void> {
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+      }),
+    );
+  }
+
+  buildKey(prefix: string, ext: string): string {
+    return `${prefix}/${randomUUID()}${ext}`;
+  }
+}
