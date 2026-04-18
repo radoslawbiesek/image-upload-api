@@ -58,7 +58,9 @@ export class ImagesService {
     );
 
     const image = await this.imagesRepository.create({
-      ...dto,
+      title: dto.title,
+      width: dto.width,
+      height: dto.height,
       sourceKey: rawKey,
       key: processedKey,
       status: 'pending',
