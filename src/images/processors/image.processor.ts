@@ -5,7 +5,9 @@ import { Job } from 'bullmq';
 import { ImagesService } from '../images.service';
 import { IMAGES_QUEUE, PROCESS_IMAGE_JOB } from './constants';
 
-type ProcessImageJobData = { imageId: string };
+import type { FitOption } from '../dto/create-image.dto';
+
+type ProcessImageJobData = { imageId: string; fit: FitOption };
 
 @Injectable()
 @Processor(IMAGES_QUEUE)
@@ -22,12 +24,12 @@ export class ImageProcessor extends WorkerHost {
       return;
     }
 
-    const { imageId } = job.data;
+    const { imageId, fit } = job.data;
     this.logger.log(
       `Processing job ${job.id} for image ${imageId}`,
       ImageProcessor.name,
     );
-    await this.imagesService.processImage(imageId);
+    await this.imagesService.processImage(imageId, fit);
     this.logger.log(
       `Job ${job.id} completed for image ${imageId}`,
       ImageProcessor.name,

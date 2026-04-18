@@ -1,6 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString, Min } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+
+export const FIT_OPTIONS = ['cover', 'contain'] as const;
+export type FitOption = (typeof FIT_OPTIONS)[number];
 
 export class CreateImageDto {
   @ApiProperty({ type: 'string', format: 'binary' })
@@ -22,4 +32,9 @@ export class CreateImageDto {
   @IsInt()
   @Min(1)
   declare height: number;
+
+  @ApiPropertyOptional({ enum: FIT_OPTIONS, default: 'cover' })
+  @IsOptional()
+  @IsIn(FIT_OPTIONS)
+  fit: FitOption = 'cover';
 }

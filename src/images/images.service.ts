@@ -13,7 +13,7 @@ import { Queue } from 'bullmq';
 
 import { Image } from '../database/schema';
 import { StorageService } from '../storage/storage.service';
-import { CreateImageDto } from './dto/create-image.dto';
+import { CreateImageDto, FitOption } from './dto/create-image.dto';
 import { ListImagesQueryDto } from './dto/list-images-query.dto';
 import { ImagesRepository } from './images.repository';
 import { IMAGES_QUEUE, PROCESS_IMAGE_JOB } from './processors/constants';
@@ -66,7 +66,7 @@ export class ImagesService {
 
     await this.imagesQueue.add(
       PROCESS_IMAGE_JOB,
-      { imageId: image.id },
+      { imageId: image.id, fit: dto.fit },
       { attempts: 3, backoff: { type: 'exponential', delay: 1000 } },
     );
 
@@ -90,7 +90,7 @@ export class ImagesService {
     };
   }
 
-  async processImage(imageId: string): Promise<void> {
+  async processImage(imageId: string, fit: FitOption): Promise<void> {
     const image = await this.imagesRepository.findById(imageId);
     if (!image || !image.sourceKey || !image.key) {
       return;
@@ -107,7 +107,7 @@ export class ImagesService {
       image.sourceKey,
     );
     const resized = await sharp(raw)
-      .resize(image.width, image.height)
+      .resize(image.width, image.height, { fit })
       .toBuffer();
 
     await this.storageService.upload(this.bucket, image.key, resized, mimeType);
