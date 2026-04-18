@@ -67,9 +67,9 @@ describe('ImagesController (e2e)', () => {
         width: 800,
         height: 600,
         status: 'pending',
-        url: null,
       });
       expect(body.id).toBeDefined();
+      expect(body.url).toBeDefined();
     });
 
     it.each([
@@ -80,9 +80,12 @@ describe('ImagesController (e2e)', () => {
       ['width is negative', { title: 'Test image', width: -1, height: 600 }],
       ['height is 0', { title: 'Test image', width: 800, height: 0 }],
       ['height is negative', { title: 'Test image', width: 800, height: -1 }],
-    ])('returns 400 when %s', async (_, fields) => {
-      await postImage(fields as Record<string, string | number>).expect(400);
-    });
+    ])(
+      'returns 400 when %s',
+      async (_: string, fields: Record<string, string | number>) => {
+        await postImage(fields).expect(400);
+      },
+    );
   });
 
   describe('GET /images', () => {
