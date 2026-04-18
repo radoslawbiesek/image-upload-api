@@ -1,6 +1,8 @@
-import { Test } from '@nestjs/testing';
-import request from 'supertest';
 import type { INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { mockClient } from 'aws-sdk-client-mock';
+import request from 'supertest';
 import type { App } from 'supertest/types';
 
 import { AppModule } from '../src/app.module';
@@ -9,7 +11,9 @@ import type { ImageResponseDto } from '../src/images/dto/image-response.dto';
 import type { ImagesResponseDto } from '../src/images/dto/images-response.dto';
 import { createApp } from './create-app';
 import { clearMockImages, saveMockImage } from './mocks';
-import { CreateImageDto } from 'src/images/dto/create-image.dto';
+
+const s3Mock = mockClient(S3Client);
+s3Mock.on(PutObjectCommand).resolves({});
 
 describe('ImagesController (e2e)', () => {
   let app: INestApplication<App>;
@@ -33,11 +37,25 @@ describe('ImagesController (e2e)', () => {
   });
 
   describe('POST /images', () => {
-    it('returns 201 with image shape', async () => {
-      const res = await request(app.getHttpServer())
+    // Minimal JPEG magic bytes — enough for file-type detection
+    const FAKE_FILE = Buffer.from([0xff, 0xd8, 0xff, 0xe0]);
+
+    function postImage(fields: Record<string, string | number> = {}) {
+      const req = request(app.getHttpServer())
         .post('/images')
-        .send({ title: 'Test image', width: 800, height: 600 })
-        .expect(201);
+        .attach('file', FAKE_FILE, { filename: 'test.jpg', contentType: 'image/jpeg' });
+      for (const [key, value] of Object.entries(fields)) {
+        req.field(key, String(value));
+      }
+      return req;
+    }
+
+    it('returns 201 with image shape', async () => {
+      const res = await postImage({
+        title: 'Test image',
+        width: 800,
+        height: 600,
+      }).expect(201);
 
       const body = res.body as ImageResponseDto;
 
@@ -60,8 +78,8 @@ describe('ImagesController (e2e)', () => {
       ['width is negative', { title: 'Test image', width: -1, height: 600 }],
       ['height is 0', { title: 'Test image', width: 800, height: 0 }],
       ['height is negative', { title: 'Test image', width: 800, height: -1 }],
-    ])('returns 400 when %s', async (_: string, body: CreateImageDto) => {
-      await request(app.getHttpServer()).post('/images').send(body).expect(400);
+    ])('returns 400 when %s', async (_, fields) => {
+      await postImage(fields as Record<string, string | number>).expect(400);
     });
   });
 
@@ -100,7 +118,7 @@ describe('ImagesController (e2e)', () => {
       const body = res.body as ImagesResponseDto;
 
       expect(body.data).toHaveLength(1);
-      expect(body.data[0].title).toBe('Beautiful sunset');
+      expect(body.data[0]?.title).toBe('Beautiful sunset');
     });
 
     it('paginates with cursor', async () => {

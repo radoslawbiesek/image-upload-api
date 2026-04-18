@@ -1,5 +1,6 @@
 import {
   FileTypeValidator,
+  HttpStatus,
   MaxFileSizeValidator,
   ParseFilePipe,
 } from '@nestjs/common';
@@ -10,6 +11,10 @@ export const imageFilePipe = new ParseFilePipe({
   fileIsRequired: true,
   validators: [
     new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE_BYTES }),
-    new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp|gif)$/ }),
+    new FileTypeValidator({
+      fileType: /^image\/(jpeg|png|webp|gif)$/,
+      fallbackToMimetype: true,
+    }),
   ],
+  errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
 });
