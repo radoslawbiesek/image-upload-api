@@ -1,5 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { getQueueToken } from '@nestjs/bullmq';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { mockClient } from 'aws-sdk-client-mock';
 import request from 'supertest';
@@ -9,11 +10,15 @@ import { AppModule } from '../src/app.module';
 import { DatabaseService } from '../src/database/database.module';
 import type { ImageResponseDto } from '../src/images/dto/image-response.dto';
 import type { ImagesResponseDto } from '../src/images/dto/images-response.dto';
+import { ImageProcessor } from '../src/images/processors/image.processor';
+import { IMAGES_QUEUE } from '../src/images/processors/constants';
 import { createApp } from './create-app';
 import { clearMockImages, saveMockImage } from './mocks';
 
 const s3Mock = mockClient(S3Client);
 s3Mock.on(PutObjectCommand).resolves({});
+
+const mockQueue = { add: jest.fn().mockResolvedValue(undefined) };
 
 describe('ImagesController (e2e)', () => {
   let app: INestApplication<App>;
@@ -22,7 +27,12 @@ describe('ImagesController (e2e)', () => {
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(getQueueToken(IMAGES_QUEUE))
+      .useValue(mockQueue)
+      .overrideProvider(ImageProcessor)
+      .useValue({})
+      .compile();
 
     app = await createApp(module);
     db = module.get(DatabaseService).drizzle;

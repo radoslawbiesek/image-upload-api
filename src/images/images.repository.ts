@@ -30,7 +30,9 @@ export class ImagesRepository {
   async findMany(options: FindManyOptions): Promise<Image[]> {
     const conditions: (SQL | undefined)[] = [];
     if (options.title) {
-      conditions.push(ilike(images.title, `%${options.title}%`));
+      // % and _ are LIKE metacharacters — escape them so user input is treated as a literal substring
+      const escaped = options.title.replace(/[%_\\]/g, '\\$&');
+      conditions.push(ilike(images.title, `%${escaped}%`));
     }
     if (options.cursor) {
       conditions.push(lte(images.id, options.cursor));

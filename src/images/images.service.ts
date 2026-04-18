@@ -61,6 +61,7 @@ export class ImagesService {
       title: dto.title,
       width: dto.width,
       height: dto.height,
+      fit: dto.fit,
       sourceKey: rawKey,
       key: processedKey,
       status: 'pending',
@@ -95,7 +96,9 @@ export class ImagesService {
   async processImage(imageId: string, fit: FitOption): Promise<void> {
     const image = await this.imagesRepository.findById(imageId);
     if (!image || !image.sourceKey || !image.key) {
-      return;
+      throw new Error(
+        `Image does not have all required fields. Image: ${JSON.stringify(image)}`,
+      );
     }
 
     const ext = path.extname(image.sourceKey).toLowerCase();
@@ -117,6 +120,7 @@ export class ImagesService {
     await this.imagesRepository.update(imageId, {
       status: 'ready',
       sourceKey: null,
+      processedAt: new Date(),
     });
   }
 
@@ -124,6 +128,7 @@ export class ImagesService {
     await this.imagesRepository.update(imageId, {
       status: 'failed',
       key: null,
+      processedAt: new Date(),
     });
   }
 
@@ -146,7 +151,7 @@ export class ImagesService {
       .replace(/[^a-z0-9\s]/g, '')
       .trim()
       .replace(/\s+/g, '-');
-    const suffix = Math.random().toString(36).slice(2, 9);
+    const suffix = randomUUID().replace(/-/g, '').slice(0, 7);
     return `${slug}-${suffix}${ext}`;
   }
 

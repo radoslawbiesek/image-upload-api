@@ -3,7 +3,7 @@ import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 
 import { ImagesService } from '../images.service';
-import { IMAGES_QUEUE, PROCESS_IMAGE_JOB } from './constants';
+import { IMAGES_QUEUE } from './constants';
 
 import type { FitOption } from '../dto/create-image.dto';
 
@@ -20,10 +20,6 @@ export class ImageProcessor extends WorkerHost {
   }
 
   async process(job: Job<ProcessImageJobData>): Promise<void> {
-    if (job.name !== PROCESS_IMAGE_JOB) {
-      return;
-    }
-
     const { imageId, fit } = job.data;
     this.logger.log(
       `Processing job ${job.id} for image ${imageId}`,

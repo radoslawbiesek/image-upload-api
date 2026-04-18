@@ -31,4 +31,16 @@ export class ImageResponseDto {
   @Expose()
   @ApiProperty({ example: 1080 })
   declare height: number;
+
+  @Expose()
+  @ApiProperty({ enum: ['cover', 'contain'], example: 'cover' })
+  declare fit: string;
+
+  @Expose()
+  @ApiProperty({ type: String, format: 'date-time' })
+  declare createdAt: Date;
+
+  @Expose()
+  @ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
+  declare processedAt: Date | null;
 }

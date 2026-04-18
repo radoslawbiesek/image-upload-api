@@ -8,6 +8,13 @@
       "when": 1776545332162,
       "tag": "0000_equal_luckman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776552985608,
+      "tag": "0001_gigantic_scourge",
+      "breakpoints": true
     }
   ]
 }
