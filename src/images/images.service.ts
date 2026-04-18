@@ -111,7 +111,11 @@ export class ImagesService {
       .toBuffer();
 
     await this.storageService.upload(this.bucket, image.key, resized, mimeType);
-    await this.imagesRepository.update(imageId, { status: 'ready' });
+    await this.storageService.deleteObject(this.bucket, image.sourceKey);
+    await this.imagesRepository.update(imageId, {
+      status: 'ready',
+      sourceKey: null,
+    });
   }
 
   async markFailed(imageId: string): Promise<void> {

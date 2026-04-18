@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -28,20 +29,23 @@ export class StorageService {
     body: Buffer,
     contentType: string,
   ): Promise<void> {
-    await this.client.send(
-      new PutObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        Body: body,
-        ContentType: contentType,
-      }),
-    );
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    });
+    await this.client.send(command);
+  }
+
+  async deleteObject(bucket: string, key: string): Promise<void> {
+    const command = new DeleteObjectCommand({ Bucket: bucket, Key: key });
+    await this.client.send(command);
   }
 
   async getObject(bucket: string, key: string): Promise<Buffer> {
-    const response = await this.client.send(
-      new GetObjectCommand({ Bucket: bucket, Key: key }),
-    );
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const response = await this.client.send(command);
     const chunks = await response.Body!.transformToByteArray();
 
     return Buffer.from(chunks);
