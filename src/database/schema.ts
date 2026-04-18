@@ -8,10 +8,10 @@ export const images = pgTable(
       .primaryKey()
       .default(sql`uuidv7()`),
     title: text('title').notNull(),
-    url: text('url'),
-    sourceUrl: text('source_url'),
+    key: text('key'),
+    sourceKey: text('source_key'),
     status: text('status', {
-      enum: ['pending', 'processing', 'ready', 'failed'],
+      enum: ['pending', 'ready', 'failed'],
     })
       .notNull()
       .default('pending'),

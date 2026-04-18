@@ -9,7 +9,7 @@ export class ListImagesQueryDto {
   })
   @IsOptional()
   @IsString()
-  search?: string;
+  title?: string;
 
   @ApiPropertyOptional({
     description:

@@ -1,8 +1,10 @@
-import { randomUUID } from 'node:crypto';
-
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 
 @Injectable()
 export class StorageService {
@@ -36,7 +38,12 @@ export class StorageService {
     );
   }
 
-  buildKey(prefix: string, ext: string): string {
-    return `${prefix}/${randomUUID()}${ext}`;
+  async getObject(bucket: string, key: string): Promise<Buffer> {
+    const response = await this.client.send(
+      new GetObjectCommand({ Bucket: bucket, Key: key }),
+    );
+    const chunks = await response.Body!.transformToByteArray();
+
+    return Buffer.from(chunks);
   }
 }

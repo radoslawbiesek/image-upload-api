@@ -3,8 +3,8 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE TABLE "images" (
 	"id" uuid PRIMARY KEY DEFAULT uuidv7() NOT NULL,
 	"title" text NOT NULL,
-	"url" text,
-	"source_url" text,
+	"key" text,
+	"source_key" text,
 	"status" text DEFAULT 'pending' NOT NULL,
 	"width" integer NOT NULL,
 	"height" integer NOT NULL

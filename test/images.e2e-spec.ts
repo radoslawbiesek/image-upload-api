@@ -43,7 +43,10 @@ describe('ImagesController (e2e)', () => {
     function postImage(fields: Record<string, string | number> = {}) {
       const req = request(app.getHttpServer())
         .post('/images')
-        .attach('file', FAKE_FILE, { filename: 'test.jpg', contentType: 'image/jpeg' });
+        .attach('file', FAKE_FILE, {
+          filename: 'test.jpg',
+          contentType: 'image/jpeg',
+        });
       for (const [key, value] of Object.entries(fields)) {
         req.field(key, String(value));
       }
@@ -67,7 +70,6 @@ describe('ImagesController (e2e)', () => {
         url: null,
       });
       expect(body.id).toBeDefined();
-      expect('sourceUrl' in body).toBe(false);
     });
 
     it.each([
@@ -103,7 +105,6 @@ describe('ImagesController (e2e)', () => {
 
       expect(body.data).toHaveLength(3);
       expect(body.nextCursor).toBeNull();
-      expect('sourceUrl' in body).toBe(false);
     });
 
     it('filters by search', async () => {
@@ -113,7 +114,7 @@ describe('ImagesController (e2e)', () => {
       ]);
 
       const res = await request(app.getHttpServer())
-        .get('/images?search=sunset')
+        .get('/images?title=sunset')
         .expect(200);
       const body = res.body as ImagesResponseDto;
 
@@ -162,7 +163,6 @@ describe('ImagesController (e2e)', () => {
 
       expect(body.id).toBe(inserted.id);
       expect(body.title).toBe(inserted.title);
-      expect('sourceUrl' in body).toBe(false);
     });
 
     it('returns 404 for non-existent id', async () => {

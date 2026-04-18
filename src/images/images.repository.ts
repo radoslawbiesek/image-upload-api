@@ -5,7 +5,7 @@ import { DatabaseService } from '../database/database.module';
 import { Image, images, NewImage } from '../database/schema';
 
 export type FindManyOptions = {
-  search?: string;
+  title?: string;
   cursor?: string;
   limit: number;
 };
@@ -29,8 +29,8 @@ export class ImagesRepository {
 
   async findMany(options: FindManyOptions): Promise<Image[]> {
     const conditions: (SQL | undefined)[] = [];
-    if (options.search) {
-      conditions.push(ilike(images.title, `%${options.search}%`));
+    if (options.title) {
+      conditions.push(ilike(images.title, `%${options.title}%`));
     }
     if (options.cursor) {
       conditions.push(lte(images.id, options.cursor));
@@ -42,6 +42,13 @@ export class ImagesRepository {
       .where(and(...conditions))
       .orderBy(desc(images.id))
       .limit(options.limit);
+  }
+
+  async update(id: string, data: Partial<NewImage>): Promise<void> {
+    await this.databaseService.drizzle
+      .update(images)
+      .set(data)
+      .where(eq(images.id, id));
   }
 
   async findById(id: string): Promise<Image | null> {

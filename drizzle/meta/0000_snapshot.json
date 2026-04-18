@@ -1,5 +1,5 @@
 {
-  "id": "e0c434d6-17fa-4b0b-a5df-e30052e6620a",
+  "id": "6a4058d9-e8ac-4e16-bd5a-0f3faca1a71b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -13,7 +13,7 @@
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "default": "gen_uuid_v7()"
+          "default": "uuidv7()"
         },
         "title": {
           "name": "title",
@@ -21,14 +21,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "url": {
-          "name": "url",
+        "key": {
+          "name": "key",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "source_url": {
-          "name": "source_url",
+        "source_key": {
+          "name": "source_key",
           "type": "text",
           "primaryKey": false,
           "notNull": false

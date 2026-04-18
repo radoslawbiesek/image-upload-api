@@ -19,7 +19,7 @@ export class ImageResponseDto {
 
   @Expose()
   @ApiProperty({
-    enum: ['pending', 'processing', 'ready', 'failed'],
+    enum: ['pending', 'ready', 'failed'],
     example: 'pending',
   })
   declare status: string;

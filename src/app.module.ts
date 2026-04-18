@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bullmq';
 
 import { AppController } from './app.controller';
 import { DatabaseModule } from './database/database.module';
@@ -9,6 +10,15 @@ import { StorageModule } from './storage/storage.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        connection: {
+          host: config.getOrThrow<string>('REDIS_HOST'),
+          port: config.getOrThrow<number>('REDIS_PORT'),
+        },
+      }),
+    }),
     DatabaseModule,
     StorageModule,
     ImagesModule,
