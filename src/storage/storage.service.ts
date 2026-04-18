@@ -1,4 +1,3 @@
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 
 import { Injectable } from '@nestjs/common';
@@ -10,12 +9,14 @@ export class StorageService {
   private readonly client: S3Client;
 
   constructor(config: ConfigService) {
+    const endpoint = config.get<string>('AWS_ENDPOINT');
     this.client = new S3Client({
       region: config.getOrThrow<string>('AWS_REGION'),
       credentials: {
         accessKeyId: config.getOrThrow<string>('AWS_ACCESS_KEY_ID'),
         secretAccessKey: config.getOrThrow<string>('AWS_SECRET_ACCESS_KEY'),
       },
+      ...(endpoint && { endpoint, forcePathStyle: true }),
     });
   }
 

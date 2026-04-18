@@ -26,6 +26,18 @@ services:
       timeout: 2s
       retries: 10
 
+  localstack:
+    image: localstack/localstack:4
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
+    ports:
+      - '4566:4566'
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - ./docker/localstack/init.sh:/etc/localstack/init/ready.d/init.sh
+
 volumes:
   postgres_data:
   postgres_test_data:
+  localstack_data:
