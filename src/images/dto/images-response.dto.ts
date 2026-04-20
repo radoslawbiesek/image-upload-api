@@ -5,12 +5,11 @@ import { ImageResponseDto } from './image-response.dto';
 export class ImagesResponseDto {
   @Expose()
   @Type(() => ImageResponseDto)
-  @ApiProperty({ type: [ImageResponseDto], isArray: true })
+  @ApiProperty({ type: [ImageResponseDto] })
   declare data: ImageResponseDto[];
 
   @Expose()
   @ApiPropertyOptional({
-    type: String,
     nullable: true,
     description:
       'UUID of the first item of the next page; null when there are no more pages',
