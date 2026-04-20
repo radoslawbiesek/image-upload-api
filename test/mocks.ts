@@ -22,6 +22,10 @@ export async function saveMockImage(
     .values(createMockImage(overrides))
     .returning();
 
+  if (!image) {
+    throw new Error('Failed to create an image');
+  }
+
   return image;
 }
 

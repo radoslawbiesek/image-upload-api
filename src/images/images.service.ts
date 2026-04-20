@@ -144,11 +144,11 @@ export class ImagesService {
     return this.withUrl(image);
   }
 
-  private buildRawKey(ext: string) {
+  buildRawKey(ext: string) {
     return `raw/${randomUUID()}${ext}`;
   }
 
-  private buildProcessedKey(title: string, ext: string): string {
+  buildProcessedKey(title: string, ext: string): string {
     const slug = title
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, '')
@@ -158,7 +158,7 @@ export class ImagesService {
     return `${slug}-${suffix}${ext}`;
   }
 
-  private withUrl(image: Image) {
+  withUrl(image: Image) {
     return {
       ...image,
       url: image.key ? `${this.cdnBaseUrl}/${image.key}` : null,

@@ -7,7 +7,7 @@ import { IMAGES_QUEUE } from './constants';
 
 import type { FitOption } from '../dto/create-image.dto';
 
-type ProcessImageJobData = { imageId: string; fit: FitOption };
+export type ProcessImageJobData = { imageId: string; fit: FitOption };
 
 @Injectable()
 @Processor(IMAGES_QUEUE)
