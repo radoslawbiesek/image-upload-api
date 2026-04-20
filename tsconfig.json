@@ -20,7 +20,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "noUncheckedIndexedAccess": true,
-    "types": ["multer", "node"]
+    "types": ["multer", "node", "jest"]
   },
-  "exclude": ["test/**/*", "node_modules"]
+  "exclude": ["node_modules"]
 }

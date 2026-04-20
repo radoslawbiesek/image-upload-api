@@ -41,14 +41,17 @@ export class ImagesService {
     this.cdnBaseUrl = config.getOrThrow<string>('CDN_BASE_URL');
   }
 
-  async create(file: Express.Multer.File, dto: CreateImageDto) {
+  async create(
+    file: Express.Multer.File,
+    imageDto: Omit<CreateImageDto, 'file'>,
+  ) {
     const ext = path.extname(file.originalname);
     if (!ext) {
       throw new BadRequestException('File must have an extension');
     }
 
     const rawKey = this.buildRawKey(ext);
-    const processedKey = this.buildProcessedKey(dto.title, ext);
+    const processedKey = this.buildProcessedKey(imageDto.title, ext);
 
     await this.storageService.upload(
       this.bucket,
@@ -58,10 +61,10 @@ export class ImagesService {
     );
 
     const image = await this.imagesRepository.create({
-      title: dto.title,
-      width: dto.width,
-      height: dto.height,
-      fit: dto.fit,
+      title: imageDto.title,
+      width: imageDto.width,
+      height: imageDto.height,
+      fit: imageDto.fit,
       sourceKey: rawKey,
       key: processedKey,
       status: 'pending',
@@ -69,7 +72,7 @@ export class ImagesService {
 
     await this.imagesQueue.add(
       PROCESS_IMAGE_JOB,
-      { imageId: image.id, fit: dto.fit },
+      { imageId: image.id, fit: imageDto.fit },
       { attempts: 3, backoff: { type: 'exponential', delay: 1000 } },
     );
 
