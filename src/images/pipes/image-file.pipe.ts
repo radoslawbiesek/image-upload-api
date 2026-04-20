@@ -12,7 +12,7 @@ export const imageFilePipe = new ParseFilePipe({
   validators: [
     new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE_BYTES }),
     new FileTypeValidator({
-      fileType: /^image\/(jpeg|png|webp|gif)$/,
+      fileType: /^image\/(jpeg|png|webp)$/,
       fallbackToMimetype: true,
     }),
   ],

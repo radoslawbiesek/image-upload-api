@@ -202,7 +202,6 @@ describe('ImagesService', () => {
 
     it('preserves the file extension', () => {
       expect(service.buildProcessedKey('Test', '.webp')).toMatch(/\.webp$/);
-      expect(service.buildProcessedKey('Test', '.gif')).toMatch(/\.gif$/);
     });
   });
 });

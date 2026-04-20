@@ -4,7 +4,7 @@ REST API for uploading and serving images. Images are uploaded to S3, resized as
 
 **Endpoints:**
 
-- `POST /images` — upload an image (JPEG, PNG, WebP, GIF), set title, width, height, and fit mode (`cover` / `contain`). Returns immediately with `status: pending`; processing happens in the background. The `url` field is pre-generated and stable, but the file will not be available at that URL until `status` becomes `ready`. Poll `GET /images/:id` to check when processing is complete.
+- `POST /images` — upload an image (JPEG, PNG, WebP), set title, width, height, and fit mode (`cover` / `contain`). Returns immediately with `status: pending`; processing happens in the background. The `url` field is pre-generated and stable, but the file will not be available at that URL until `status` becomes `ready`. Poll `GET /images/:id` to check when processing is complete.
 - `GET /images` — list images with optional title filter and cursor pagination.
 - `GET /images/:id` — get a single image by ID.
 
