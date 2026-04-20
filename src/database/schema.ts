@@ -15,8 +15,8 @@ export const images = pgTable(
       .primaryKey()
       .default(sql`uuidv7()`),
     title: text('title').notNull(),
-    key: text('key'),
-    sourceKey: text('source_key'),
+    key: text('key').unique(),
+    sourceKey: text('source_key').unique(),
     status: text('status', {
       enum: ['pending', 'ready', 'failed'],
     })

@@ -15,6 +15,13 @@
       "when": 1776552985608,
       "tag": "0001_gigantic_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776665857326,
+      "tag": "0002_flowery_smiling_tiger",
+      "breakpoints": true
     }
   ]
 }
